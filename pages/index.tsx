@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
+import Home from '../modules/Home';
 
 const HomePage: React.FC = () => {
   return (
     <div>
-      <h1>Home Page</h1>
-      <p>Home page content</p>
+      <Home />
     </div>
   );
 };

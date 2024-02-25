@@ -1,14 +1,14 @@
 import React from 'react';
-import { StyledImage } from './styles';
+import { StyledImage, ImageContainer } from './styles';
 
 const Home: React.FC = () => {
   return (
-    <div>
+    <ImageContainer>
       <StyledImage
-        src="/public/assets/carewallet.png"
+        src="/assets/carewallet.png"
         alt="Description of the image"
       />
-    </div>
+    </ImageContainer>
   );
 };
 
