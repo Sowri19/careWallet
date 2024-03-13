@@ -1,13 +1,11 @@
 import React from 'react';
-import { StyledImage, ImageContainer } from './styles';
+import { ImageContainer } from './styles';
+import ChatBot from '../../components/ChatBot/index';
 
 const Home: React.FC = () => {
   return (
     <ImageContainer>
-      <StyledImage
-        src="/assets/carewallet.png"
-        alt="Description of the image"
-      />
+      <ChatBot />
     </ImageContainer>
   );
 };
