@@ -16,9 +16,14 @@ interface Conversation {
   response: string;
 }
 
-const ChatBot = () => {
+interface ChatBotProps {
+  initialConversations: Conversation[];
+}
+
+const ChatBot = ({ initialConversations }: ChatBotProps) => {
   const [message, setMessage] = useState('');
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [conversations, setConversations] =
+    useState<Conversation[]>(initialConversations);
 
   const sendMessage = async () => {
     try {
@@ -53,5 +58,18 @@ const ChatBot = () => {
     </ChatContainer>
   );
 };
+
+// Fetch initial conversations from the server
+export async function getServerSideProps() {
+  try {
+    const res = await axios.get(
+      'https://your-api-url.com/initial-conversations'
+    );
+    return { props: { initialConversations: res.data || [] } };
+  } catch (error) {
+    console.error('Error fetching initial conversations:', error);
+    return { props: { initialConversations: [] } };
+  }
+}
 
 export default ChatBot;
