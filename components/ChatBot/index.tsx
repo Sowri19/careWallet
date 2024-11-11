@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import useSWR from 'swr';
+
 import {
   Input,
   Button,
@@ -16,24 +18,48 @@ interface Conversation {
   response: string;
 }
 
-interface ChatBotProps {
-  initialConversations: Conversation[];
-}
+// SWR fetcher function
+const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
-const ChatBot = ({ initialConversations }: ChatBotProps) => {
+const ChatBot = () => {
   const [message, setMessage] = useState('');
-  const [conversations, setConversations] =
-    useState<Conversation[]>(initialConversations);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+
+  // Use SWR to fetch initial conversations or chat history
+  const { data, error, mutate } = useSWR<Conversation[]>(
+    'https://your-api-url.com/conversations',
+    fetcher
+  );
+
+  // Update local state with SWR data on load
+  React.useEffect(() => {
+    if (data) {
+      setConversations(data);
+    }
+  }, [data]);
 
   const sendMessage = async () => {
     try {
-      const res = await axios.post('https://your-api-url.com', { message });
-      setConversations([...conversations, { message, response: res.data }]);
+      const res = await axios.post('https://your-api-url.com/message', {
+        message,
+      });
+      const newConversation = { message, response: res.data };
+
+      // Update the local state
+      setConversations((prev) => [...prev, newConversation]);
+
+      // Optionally, revalidate the SWR data to keep it in sync
+      mutate();
+
+      // Clear the input field
       setMessage('');
     } catch (error) {
       console.error(error);
     }
   };
+
+  if (error) return <div>Error loading conversations...</div>;
+  if (!data) return <div>Loading...</div>;
 
   return (
     <ChatContainer>
@@ -58,18 +84,5 @@ const ChatBot = ({ initialConversations }: ChatBotProps) => {
     </ChatContainer>
   );
 };
-
-// Fetch initial conversations from the server
-export async function getServerSideProps() {
-  try {
-    const res = await axios.get(
-      'https://your-api-url.com/initial-conversations'
-    );
-    return { props: { initialConversations: res.data || [] } };
-  } catch (error) {
-    console.error('Error fetching initial conversations:', error);
-    return { props: { initialConversations: [] } };
-  }
-}
 
 export default ChatBot;
